@@ -1,55 +1,49 @@
 const Atendimento = require('../models/Atendimento');
 
 module.exports = app => {
-  app.get('/atendimentos', async (req, res) => {
-    const atendimentos = await Atendimento.listar();
-
-    done(atendimentos, res);
+  app.get('/atendimentos', (req, res) => {
+    Atendimento.listar()
+      .then(resultado => res.json(resultado))
+      .catch(error => res.status(400).json(error))
   })
 
-  app.get('/atendimentos/:id', async (req, res) => {
+  app.get('/atendimentos/:id', (req, res) => {
     const id = parseInt(req.params.id);
 
-    const atendimento = await Atendimento.exibir(id);
-
-    done(atendimento, res);
+    Atendimento.exibir(id)
+      .then(resultado => res.json(resultado))
+      .catch(error => res.status(400).json(error))
   })
 
-  app.post('/atendimentos', async (req, res) => {
+  app.post('/atendimentos', (req, res) => {
     const atendimento = req.body;
 
-    const result = await Atendimento.adicionar(atendimento);
-
-    done(result, res);
+    Atendimento.adicionar(atendimento)
+      .then(atendimentoCadastrado => {
+        console.log(atendimentoCadastrado)
+        res.status(201).json(atendimentoCadastrado)
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(400).json(error)
+      })
   })
 
   app.patch('/atendimentos/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     const atendimento = req.body;
 
-    const result = await Atendimento.alterar(id, atendimento);
-
-    done(result, res);
+    Atendimento.alterar(id, atendimento)
+      .then(atendimento => res.json(atendimento))
+      .catch(error => res.status(400).json())
   })
 
   app.delete('/atendimentos/:id', async (req, res) => {
     const id = parseInt(req.params.id);
 
-    const result = await Atendimento.remover(id);
-
-    done(result, res);
+    Atendimento.remover(id)
+      .then(resultado => res.json(resultado))
+      .catch(error => res.status(400).json(error))
   })
 
-}
-
-function done(result, res) {
-  if (result) {
-    if (result.error) {
-      return res.status(400).json(result.error);
-    }
-
-    return res.status(201).json(result);
-  }
-
-  return res.status(404).json({ msg: "Nenhum registro encontrado" });
 }
